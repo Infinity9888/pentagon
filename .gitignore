@@ -1,7 +1,28 @@
+# Dependencies
 node_modules/
+
+# Build output
 dist/
-build/
-.env
-*.log
-.vscode/
 dist-electron/
+build/
+release/
+
+# Environment
+.env
+.env.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Test files
+test.js
+test3.js

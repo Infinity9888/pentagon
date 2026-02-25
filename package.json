@@ -7,7 +7,7 @@
     "license": "MIT",
     "scripts": {
         "dev": "vite",
-        "build": "vite build && electron-builder",
+        "build": "cross-env CSC_LINK=null vite build && electron-builder",
         "preview": "vite preview"
     },
     "dependencies": {
@@ -28,5 +28,28 @@
         "vite": "^6.2.0",
         "vite-plugin-electron": "^0.28.0",
         "vite-plugin-electron-renderer": "^0.14.0"
+    },
+    "build": {
+        "appId": "com.pentagon.launcher",
+        "productName": "Pentagon Launcher",
+        "directories": {
+            "output": "release/${version}"
+        },
+        "files": [
+            "dist-electron",
+            "dist",
+            "package.json"
+        ],
+        "win": {
+            "forceCodeSigning": false,
+            "target": [
+                {
+                    "target": "dir",
+                    "arch": [
+                        "x64"
+                    ]
+                }
+            ]
+        }
     }
 }
