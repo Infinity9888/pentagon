@@ -1,0 +1,147 @@
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--z-modal);
+}
+
+.instance-config-modal {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    width: 90vw;
+    max-width: 1000px;
+    height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+}
+
+.config-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-4) var(--space-6);
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.config-header-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.title-icon {
+    width: 24px;
+    height: 24px;
+    image-rendering: pixelated;
+}
+
+.config-header h2 {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    margin: 0;
+}
+
+/* Base modal layout: sidebar + content */
+.config-body {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Sidebar styling mimicking Prism Launcher */
+.config-sidebar {
+    width: 200px;
+    background: var(--color-bg-tertiary);
+    border-right: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-2) 0;
+    overflow-y: auto;
+}
+
+.config-sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background: transparent;
+    border: none;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    text-align: left;
+    cursor: pointer;
+    transition: var(--transition-colors);
+}
+
+.config-sidebar-item:hover {
+    background: var(--color-surface-hover);
+    color: var(--color-text-primary);
+}
+
+.config-sidebar-item.active {
+    background: var(--color-surface-active);
+    color: var(--color-accent);
+}
+
+.config-sidebar-icon {
+    font-size: 16px;
+}
+
+/* Main Content Area */
+.config-content {
+    flex: 1;
+    padding: var(--space-6);
+    overflow-y: auto;
+    background: var(--color-bg-primary);
+}
+
+/* Placeholder for views */
+.view-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--color-text-muted);
+    text-align: center;
+    gap: var(--space-4);
+}
+
+/* Footer styling */
+.config-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-6);
+    background: var(--color-surface);
+    border-top: 1px solid var(--color-border);
+}
+
+/* Animations */
+.animate-slide-up {
+    animation: slideUp var(--duration-base) var(--ease-out);
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}

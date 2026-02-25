@@ -1,0 +1,150 @@
+.config-view {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: var(--space-4);
+}
+
+.view-header {
+    margin-bottom: var(--space-2);
+}
+
+.view-header h3 {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--space-1);
+    color: var(--color-text-primary);
+}
+
+.view-header p {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+}
+
+.view-header.flex-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.view-actions {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.view-content {
+    flex: 1;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    overflow-y: auto;
+}
+
+/* Data Table Styling (used in Mods and Versions) */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: var(--font-size-sm);
+}
+
+.data-table th,
+.data-table td {
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.data-table th {
+    background: var(--color-bg-tertiary);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-secondary);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.data-table tr:last-child td {
+    border-bottom: none;
+}
+
+.data-table tbody tr:hover {
+    background: var(--color-surface-hover);
+}
+
+.status-ok {
+    color: var(--color-success);
+    font-weight: var(--font-weight-medium);
+}
+
+.disabled-row {
+    opacity: 0.5;
+    text-decoration: line-through;
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* Modrinth / Pack Info Panel */
+.pack-info-card {
+    padding: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+}
+
+.pack-details p {
+    margin-bottom: var(--space-2);
+    font-size: var(--font-size-base);
+}
+
+.pack-update-section {
+    border-top: 1px solid var(--color-border);
+    padding-top: var(--space-6);
+}
+
+.update-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+}
+
+.form-select {
+    background: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-primary);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    outline: none;
+    font-family: inherit;
+    font-size: var(--font-size-sm);
+}
+
+.form-select:focus {
+    border-color: var(--color-accent);
+}
+
+.changelog-box {
+    background: var(--color-bg-primary);
+    border: 1px inset var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.changelog-box h4 {
+    margin-bottom: var(--space-2);
+    color: var(--color-text-primary);
+    font-family: var(--font-family);
+}
+
+.changelog-box ul {
+    padding-left: var(--space-4);
+    margin: 0;
+}

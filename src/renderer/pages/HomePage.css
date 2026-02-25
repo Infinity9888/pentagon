@@ -1,0 +1,113 @@
+.home-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-10);
+    max-width: 900px;
+    margin: 0 auto;
+    padding-top: var(--space-8);
+}
+
+/* Hero */
+.hero {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-8);
+}
+
+.hero-title {
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: var(--letter-spacing-tight);
+    line-height: var(--line-height-tight);
+}
+
+.hero-gradient {
+    background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent2) 50%, #ec4899 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-subtitle {
+    font-size: var(--font-size-md);
+    color: var(--color-text-secondary);
+    margin-top: var(--space-2);
+}
+
+.hero-actions {
+    display: flex;
+    gap: var(--space-4);
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-5);
+    border: none;
+    border-radius: var(--radius-lg);
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    transition: var(--transition-all);
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--color-accent), var(--color-accent2));
+    color: white;
+    box-shadow: var(--shadow-glow);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow-lg);
+    filter: brightness(1.1);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-secondary {
+    background: var(--color-surface);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border);
+}
+
+.btn-secondary:hover {
+    background: var(--color-surface-hover);
+    border-color: var(--color-border-hover);
+    transform: translateY(-1px);
+}
+
+.btn-lg {
+    padding: var(--space-3) var(--space-6);
+    font-size: var(--font-size-md);
+    border-radius: var(--radius-xl);
+}
+
+/* News Feed UI */
+.news-header {
+    margin-bottom: var(--space-4);
+}
+
+.news-card {
+    cursor: pointer;
+}
+
+.news-card:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-border-hover) !important;
+}
+
+/* Tab buttons inside the content tabs */
+.content-tabs .tab:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: var(--color-text-primary) !important;
+}

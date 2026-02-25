@@ -1,0 +1,21 @@
+.app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: var(--color-bg-primary);
+    overflow: hidden;
+}
+
+.app-body {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.app-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: var(--content-padding);
+    animation: fadeIn var(--duration-slow) var(--ease-out);
+}
