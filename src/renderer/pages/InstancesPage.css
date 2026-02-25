@@ -1,0 +1,189 @@
+.page {
+    animation: fadeIn var(--duration-slow) var(--ease-out);
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-6);
+}
+
+.page-title {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: var(--letter-spacing-tight);
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-16) 0;
+    gap: var(--space-4);
+    text-align: center;
+}
+
+.empty-icon {
+    color: var(--color-text-muted);
+    opacity: 0.4;
+    margin-bottom: var(--space-2);
+}
+
+.empty-state h3 {
+    font-size: var(--font-size-lg);
+    color: var(--color-text-secondary);
+    font-weight: var(--font-weight-medium);
+}
+
+.empty-state p {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+}
+
+/* Instance grid (when populated) */
+.instances-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: var(--space-4);
+}
+
+.instance-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-4);
+    transition: var(--transition-all);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    position: relative;
+    overflow: hidden;
+}
+
+.instance-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-border-hover);
+    box-shadow: var(--shadow-md);
+}
+
+.instance-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-lg);
+    background: var(--color-bg-tertiary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.instance-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+.instance-info h3 {
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--space-1);
+}
+
+.instance-info p {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+}
+
+.instance-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-top: auto;
+}
+
+.instance-actions-row {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.btn-play {
+    background: var(--color-accent);
+    color: var(--color-bg-primary);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-md);
+    font-weight: var(--font-weight-bold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    transition: var(--transition-bounce);
+    border: 1px solid transparent;
+}
+
+.btn-play:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+.btn-play:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Launch Overlay */
+.instance-launch-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(10, 10, 15, 0.85);
+    backdrop-filter: blur(8px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-4);
+    z-index: 10;
+    border-radius: var(--radius-xl);
+    padding: var(--space-4);
+    text-align: center;
+}
+
+.launch-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--color-border);
+    border-top-color: var(--color-accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.launch-status {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-medium);
+}
+
+.launch-progress-bar {
+    width: 80%;
+    height: 6px;
+    background: var(--color-bg-tertiary);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.launch-progress-fill {
+    height: 100%;
+    background: var(--color-accent);
+    transition: width 0.2s ease-out;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
