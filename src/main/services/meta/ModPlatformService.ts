@@ -33,7 +33,7 @@ export class ModPlatformService {
     private static MODRINTH_API = 'https://api.modrinth.com/v2';
     private static CURSEFORGE_API = 'https://api.curseforge.com/v1';
     private static CURSEFORGE_API_KEY = '$2a$10$wuAJuNZuted3NORVmpgUC.m8sI.pv1tOPKZyBgLFGjxFp/br0lZCC';
-    private static USER_AGENT = 'PentagonLauncher/0.1.0 (contact@pentagon.com)';
+    private static USER_AGENT = 'PentagonLauncher/0.2.0 (contact@pentagon.com)';
 
     /**
      * Search Modrinth for projects (mods, modpacks)

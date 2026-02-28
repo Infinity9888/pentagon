@@ -77,7 +77,7 @@ export class LaunchService {
                 version_type: versionJson.type,
                 natives_directory: nativesDir,
                 launcher_name: 'Pentagon Launcher',
-                launcher_version: '0.1.0',
+                launcher_version: '0.2.0',
                 classpath: classpathPaths,
                 resolution_width: '854',
                 resolution_height: '480'
