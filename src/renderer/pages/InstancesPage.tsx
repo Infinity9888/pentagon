@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import InstanceConfigModal from '../components/InstanceConfigModal';
 import CreateInstanceModal from '../components/instances/CreateInstanceModal';
+import { useTranslation } from '../i18n';
 import './InstancesPage.css';
 
 export default function InstancesPage() {
+    const { t } = useTranslation();
     const [isLaunching, setIsLaunching] = useState(false);
     const [launchStatus, setLaunchStatus] = useState('');
     const [launchProgress, setLaunchProgress] = useState(0);
@@ -24,6 +26,16 @@ export default function InstancesPage() {
             console.error('Failed to load instances', e);
         }
     };
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                setDeleteConfirmId(null);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
 
     useEffect(() => {
         loadInstances();
@@ -65,7 +77,7 @@ export default function InstancesPage() {
 
     const handlePlay = async (launchId: string) => {
         setIsLaunching(true);
-        setLaunchStatus('Preparing to launch...');
+        setLaunchStatus(t('instances.launching'));
         setLaunchProgress(0);
         setLogs([]);
 
@@ -89,12 +101,12 @@ export default function InstancesPage() {
     return (
         <div className="page instances-page animate-fade-in">
             <div className="page-header">
-                <h2 className="page-title">Instances</h2>
+                <h2 className="page-title">{t('instances.title')}</h2>
                 <button className="btn btn-primary" onClick={() => setIsCreating(true)} disabled={isLaunching}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                         <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
                     </svg>
-                    New Instance
+                    {t('instances.new')}
                 </button>
             </div>
 
@@ -122,7 +134,7 @@ export default function InstancesPage() {
                                         <circle cx="12" cy="12" r="3"></circle>
                                         <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
                                     </svg>
-                                    Configure
+                                    {t('instances.configure')}
                                 </button>
                                 <button
                                     className="btn btn-secondary text-error hover-action"
@@ -145,7 +157,7 @@ export default function InstancesPage() {
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none">
                                         <rect x="6" y="6" width="12" height="12" rx="2" ry="2"></rect>
                                     </svg>
-                                    Kill Process
+                                    {t('instances.kill')}
                                 </button>
                             ) : (
                                 <button
@@ -157,7 +169,7 @@ export default function InstancesPage() {
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none">
                                         <polygon points="5 3 19 12 5 21 5 3"></polygon>
                                     </svg>
-                                    Play
+                                    {t('instances.play')}
                                 </button>
                             )}
                         </div>
@@ -220,8 +232,8 @@ export default function InstancesPage() {
                 <div className="modal-backdrop animate-fade-in" style={{ zIndex: 100 }}>
                     <div className="create-modal animate-slide-up" style={{ maxWidth: '400px' }}>
                         <div className="create-header">
-                            <h2>Удаление сборки</h2>
-                            <button className="btn-icon" onClick={() => setDeleteConfirmId(null)} title="Закрыть">
+                            <h2>{t('instances.deleteConfirm')}</h2>
+                            <button className="btn-icon" onClick={() => setDeleteConfirmId(null)} title={t('home.close')}>
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                                     <line x1="18" y1="6" x2="6" y2="18"></line>
                                     <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -230,14 +242,14 @@ export default function InstancesPage() {
                         </div>
                         <div className="create-body">
                             <p style={{ margin: '0 0 var(--space-2) 0', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
-                                Вы действительно хотите безвозвратно удалить сборку <strong style={{ color: 'var(--color-text-primary)' }}>{instanceToDelete.config.name}</strong>?
+                                {t('instances.deleteText')} <strong style={{ color: 'var(--color-text-primary)' }}>{instanceToDelete.config.name}</strong>?
                             </p>
                             <p style={{ margin: 0, marginTop: 'var(--space-2)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-error)', background: 'rgba(239, 68, 68, 0.1)', padding: 'var(--space-2)', borderRadius: 'var(--radius-md)' }}>
-                                Внимание: все миры, моды и настройки будут потеряны навсегда. Это действие нельзя отменить!
+                                {t('instances.deleteWarning')}
                             </p>
                         </div>
                         <div className="create-footer" style={{ marginTop: 'var(--space-4)' }}>
-                            <button className="btn btn-secondary" onClick={() => setDeleteConfirmId(null)}>Отмена</button>
+                            <button className="btn btn-secondary" onClick={() => setDeleteConfirmId(null)}>{t('home.cancel')}</button>
                             <button
                                 className="btn btn-error"
                                 onClick={async () => {
@@ -249,7 +261,7 @@ export default function InstancesPage() {
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
                                     <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6" />
                                 </svg>
-                                Да, удалить
+                                {t('instances.deleteYes')}
                             </button>
                         </div>
                     </div>

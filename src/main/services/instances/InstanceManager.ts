@@ -156,4 +156,50 @@ export class InstanceManager {
             throw new Error(`Instance not found: ${id}`);
         }
     }
+
+    public static async installLocalFiles(files: string[]): Promise<void> {
+        const instances = await this.getInstances();
+        if (instances.length === 0) {
+            throw new Error('No instances found to install files to. Please create an instance first.');
+        }
+
+        // Find the most recently used instance, or default to the first one
+        const targetInstance = instances.sort((a, b) => {
+            const timeA = a.config.lastLaunchTime || 0;
+            const timeB = b.config.lastLaunchTime || 0;
+            return timeB - timeA;
+        })[0];
+
+        const targetPath = path.join(this.getInstancesDir(), targetInstance.id, '.minecraft');
+
+        for (const filePath of files) {
+            const ext = path.extname(filePath).toLowerCase();
+            const fileName = path.basename(filePath);
+
+            if (ext === '.jar') {
+                const modsDir = path.join(targetPath, 'mods');
+                if (!fs.existsSync(modsDir)) fs.mkdirSync(modsDir, { recursive: true });
+                fs.copyFileSync(filePath, path.join(modsDir, fileName));
+            } else if (ext === '.zip') {
+                const rpDir = path.join(targetPath, 'resourcepacks');
+                if (!fs.existsSync(rpDir)) fs.mkdirSync(rpDir, { recursive: true });
+                fs.copyFileSync(filePath, path.join(rpDir, fileName));
+            } else {
+                console.warn(`Skipping unsupported file type: ${fileName}`);
+            }
+        }
+    }
+
+    public static async addLocalMods(id: string, files: string[]): Promise<void> {
+        const instancesDir = this.getInstancesDir();
+        const modsDir = path.join(instancesDir, id, '.minecraft', 'mods');
+        if (!fs.existsSync(modsDir)) {
+            fs.mkdirSync(modsDir, { recursive: true });
+        }
+
+        for (const filePath of files) {
+            const fileName = path.basename(filePath);
+            fs.copyFileSync(filePath, path.join(modsDir, fileName));
+        }
+    }
 }

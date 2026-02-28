@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from '../i18n';
 import './SettingsPage.css';
 
 export default function SettingsPage() {
+    const { t, setLanguage } = useTranslation();
     const [settings, setSettings] = useState<any>(null);
 
     useEffect(() => {
@@ -15,28 +17,30 @@ export default function SettingsPage() {
 
         if (key === 'theme') {
             document.documentElement.setAttribute('data-theme', value);
+        } else if (key === 'language') {
+            setLanguage(value);
         }
     };
 
     if (!settings) {
-        return <div className="page settings-page"><div className="page-header"><h2>Загрузка...</h2></div></div>;
+        return <div className="page settings-page"><div className="page-header"><h2>{t('mods.downloading')}</h2></div></div>;
     }
 
     return (
         <div className="page settings-page animate-fade-in">
             <div className="page-header">
-                <h2 className="page-title">Настройки</h2>
+                <h2 className="page-title">{t('settings.title')}</h2>
             </div>
 
             <div className="settings-sections">
                 {/* Java */}
                 <section className="settings-section">
-                    <h3 className="settings-section-title">Java & Память</h3>
+                    <h3 className="settings-section-title">{t('settings.javaMemory')}</h3>
                     <div className="settings-group">
                         <div className="setting-row">
                             <div className="setting-info">
-                                <label>Путь к Java</label>
-                                <span className="setting-hint">{settings.javaPath || 'Автоматически определяется'}</span>
+                                <label>{t('settings.javaPath')}</label>
+                                <span className="setting-hint">{settings.javaPath || t('settings.autoDetect')}</span>
                             </div>
                             <button
                                 className="btn btn-secondary btn-sm"
@@ -45,13 +49,13 @@ export default function SettingsPage() {
                                     if (path) handleChange('javaPath', path);
                                 }}
                             >
-                                Выбрать
+                                {t('settings.select')}
                             </button>
                         </div>
                         <div className="setting-row">
                             <div className="setting-info">
-                                <label>Максимальная память (RAM)</label>
-                                <span className="setting-hint">Рекомендуется 4-8 ГБ для модов</span>
+                                <label>{t('settings.maxRam')}</label>
+                                <span className="setting-hint">{t('settings.ramHint')}</span>
                             </div>
                             <div className="setting-control">
                                 <input
@@ -66,8 +70,8 @@ export default function SettingsPage() {
                         </div>
                         <div className="setting-row">
                             <div className="setting-info">
-                                <label>Аргументы JVM</label>
-                                <span className="setting-hint">Дополнительные параметры запуска</span>
+                                <label>{t('settings.jvmArgs')}</label>
+                                <span className="setting-hint">{t('settings.jvmHint')}</span>
                             </div>
                             <input
                                 type="text"
@@ -82,25 +86,40 @@ export default function SettingsPage() {
 
                 {/* Appearance */}
                 <section className="settings-section">
-                    <h3 className="settings-section-title">Внешний вид</h3>
+                    <h3 className="settings-section-title">{t('settings.appearance')}</h3>
                     <div className="settings-group">
                         <div className="setting-row">
                             <div className="setting-info">
-                                <label>Тема</label>
+                                <label>{t('settings.language')}</label>
+                            </div>
+                            <div className="theme-switcher">
+                                <button
+                                    className={`theme-btn ${settings.language === 'ru' ? 'active' : ''}`}
+                                    onClick={() => handleChange('language', 'ru')}
+                                >{t('settings.ru')}</button>
+                                <button
+                                    className={`theme-btn ${settings.language === 'en' ? 'active' : ''}`}
+                                    onClick={() => handleChange('language', 'en')}
+                                >{t('settings.en')}</button>
+                            </div>
+                        </div>
+                        <div className="setting-row">
+                            <div className="setting-info">
+                                <label>{t('settings.theme')}</label>
                             </div>
                             <div className="theme-switcher">
                                 <button
                                     className={`theme-btn ${settings.theme === 'dark' ? 'active' : ''}`}
                                     onClick={() => handleChange('theme', 'dark')}
-                                >Тёмная</button>
+                                >{t('settings.dark')}</button>
                                 <button
                                     className={`theme-btn ${settings.theme === 'light' ? 'active' : ''}`}
                                     onClick={() => handleChange('theme', 'light')}
-                                >Светлая</button>
+                                >{t('settings.light')}</button>
                                 <button
                                     className={`theme-btn ${settings.theme === 'cream' ? 'active' : ''}`}
                                     onClick={() => handleChange('theme', 'cream')}
-                                >Кремовая</button>
+                                >{t('settings.cream')}</button>
                             </div>
                         </div>
                     </div>
@@ -108,11 +127,11 @@ export default function SettingsPage() {
 
                 {/* Launch */}
                 <section className="settings-section">
-                    <h3 className="settings-section-title">Запуск</h3>
+                    <h3 className="settings-section-title">{t('settings.launch')}</h3>
                     <div className="settings-group">
                         <div className="setting-row">
                             <div className="setting-info">
-                                <label>Показывать консоль</label>
+                                <label>{t('settings.showConsole')}</label>
                             </div>
                             <label className="toggle">
                                 <input

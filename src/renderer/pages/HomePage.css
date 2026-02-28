@@ -41,56 +41,6 @@
     gap: var(--space-4);
 }
 
-/* Buttons */
-.btn {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-2) var(--space-5);
-    border: none;
-    border-radius: var(--radius-lg);
-    font-family: var(--font-family);
-    font-size: var(--font-size-base);
-    font-weight: var(--font-weight-semibold);
-    cursor: pointer;
-    transition: var(--transition-all);
-    text-decoration: none;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, var(--color-accent), var(--color-accent2));
-    color: white;
-    box-shadow: var(--shadow-glow);
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-glow-lg);
-    filter: brightness(1.1);
-}
-
-.btn-primary:active {
-    transform: translateY(0);
-}
-
-.btn-secondary {
-    background: var(--color-surface);
-    color: var(--color-text-primary);
-    border: 1px solid var(--color-border);
-}
-
-.btn-secondary:hover {
-    background: var(--color-surface-hover);
-    border-color: var(--color-border-hover);
-    transform: translateY(-1px);
-}
-
-.btn-lg {
-    padding: var(--space-3) var(--space-6);
-    font-size: var(--font-size-md);
-    border-radius: var(--radius-xl);
-}
-
 /* News Feed UI */
 .news-header {
     margin-bottom: var(--space-4);

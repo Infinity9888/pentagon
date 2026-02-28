@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { type PageId } from '../App';
+import { useTranslation } from '../i18n';
 import './HomePage.css';
 
 interface HomePageProps {
@@ -7,11 +8,27 @@ interface HomePageProps {
 }
 
 export default function HomePage({ onNavigate }: HomePageProps) {
+    const { t } = useTranslation();
     const [newsTab, setNewsTab] = useState<'minecraft' | 'changelog'>('minecraft');
     const [mcNews, setMcNews] = useState<any[]>([]);
     const [ghReleases, setGhReleases] = useState<any[]>([]);
     const [updateAvailable, setUpdateAvailable] = useState(false);
     const [loading, setLoading] = useState(true);
+
+    const [instances, setInstances] = useState<any[]>([]);
+    const [selectedInstanceId, setSelectedInstanceId] = useState<string>('');
+    const [isLaunching, setIsLaunching] = useState(false);
+    const [showPlayModal, setShowPlayModal] = useState(false);
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && showPlayModal && !isLaunching) {
+                setShowPlayModal(false);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [showPlayModal, isLaunching]);
 
     useEffect(() => {
         const fetchNews = async () => {
@@ -34,8 +51,47 @@ export default function HomePage({ onNavigate }: HomePageProps) {
             }
         };
 
+        const loadInstances = async () => {
+            try {
+                const list = await window.pentagon?.instances?.list?.();
+                if (list) {
+                    setInstances(list);
+                    if (list.length > 0) {
+                        setSelectedInstanceId(list[0].id);
+                    }
+                }
+            } catch (err) {
+                console.error('Failed to fetch instances', err);
+            }
+        };
+
         fetchNews();
+        loadInstances();
     }, []);
+
+    const handlePlayClick = () => {
+        if (instances.length > 0) {
+            setShowPlayModal(true);
+            if (!selectedInstanceId) setSelectedInstanceId(instances[0].id);
+        } else {
+            onNavigate('instances');
+        }
+    };
+
+    const handleConfirmPlay = async () => {
+        if (!selectedInstanceId) return;
+        setIsLaunching(true);
+        try {
+            const res = await window.pentagon?.instances?.launch?.(selectedInstanceId);
+            if (res && res.error) {
+                alert(`${t('home.launchError')} ${res.error}`);
+            }
+        } catch (e: any) {
+            alert(`${t('home.launchError')} ${e.message}`);
+        } finally {
+            setIsLaunching(false);
+        }
+    };
 
     return (
         <div className="home-page">
@@ -45,24 +101,20 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                     <h1 className="hero-title">
                         <span className="hero-gradient">Pentagon</span>
                     </h1>
-                    <p className="hero-subtitle">Minecraft Launcher нового поколения</p>
+                    <p className="hero-subtitle">{t('home.subtitle')}</p>
                 </div>
 
-                <div className="hero-actions">
+                <div className="hero-actions" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '260px', margin: '0 auto' }}>
                     <button
                         className="btn btn-primary btn-lg animate-glow"
-                        onClick={() => onNavigate('instances')}
+                        onClick={handlePlayClick}
+                        disabled={isLaunching}
+                        style={{ width: '100%', justifyContent: 'center' }}
                     >
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <polygon points="5 3 19 12 5 21 5 3" />
                         </svg>
-                        Играть
-                    </button>
-                    <button
-                        className="btn btn-secondary btn-lg"
-                        onClick={() => onNavigate('instances')}
-                    >
-                        Создать инстанс
+                        {isLaunching ? t('home.launching') : t('home.play')}
                     </button>
                 </div>
             </section>
@@ -140,6 +192,57 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                     )}
                 </div>
             </section>
+
+            {/* Play Modal */}
+            {showPlayModal && (
+                <div className="modal-backdrop animate-fade-in" style={{ zIndex: 100 }}>
+                    <div className="create-modal animate-slide-up" style={{ maxWidth: '400px' }}>
+                        <div className="create-header">
+                            <h2>{t('home.selectInstance')}</h2>
+                            <button className="btn-icon" onClick={() => setShowPlayModal(false)} title={t('home.close')} disabled={isLaunching}>
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        </div>
+                        <div className="create-body">
+                            <p style={{ margin: '0 0 var(--space-4) 0', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
+                                {t('home.selectToLaunch')}
+                            </p>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', maxHeight: '300px', overflowY: 'auto' }} className="custom-scrollbar">
+                                {instances.map(inst => (
+                                    <button
+                                        key={inst.id}
+                                        className={`btn ${selectedInstanceId === inst.id ? 'btn-primary' : 'btn-secondary'}`}
+                                        style={{ justifyContent: 'flex-start', padding: 'var(--space-3)', width: '100%', height: 'auto', border: selectedInstanceId === inst.id ? '1px solid var(--color-primary)' : '1px solid var(--color-border)', color: selectedInstanceId === inst.id ? 'var(--color-bg-primary)' : 'var(--color-text-primary)' }}
+                                        disabled={isLaunching}
+                                        onClick={() => setSelectedInstanceId(inst.id)}
+                                    >
+                                        <div style={{ textAlign: 'left', flex: 1 }}>
+                                            <div style={{ fontWeight: 600, marginBottom: '4px' }}>{inst.config.name}</div>
+                                            <div style={{ fontSize: '12px', opacity: 0.8 }}>
+                                                {inst.config.version?.fabric ? `Fabric ${inst.config.version.fabric} ` : inst.config.version?.forge ? `Forge ${inst.config.version.forge} ` : 'Vanilla '}
+                                                ({inst.config.version?.minecraft})
+                                            </div>
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="create-footer" style={{ marginTop: 'var(--space-4)' }}>
+                            <button className="btn btn-secondary" disabled={isLaunching} onClick={() => setShowPlayModal(false)}>{t('home.cancel')}</button>
+                            <button className="btn btn-primary" disabled={isLaunching || !selectedInstanceId} onClick={handleConfirmPlay}>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
+                                    <polygon points="5 3 19 12 5 21 5 3" />
+                                </svg>
+                                {isLaunching ? t('home.launching') : t('home.play')}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

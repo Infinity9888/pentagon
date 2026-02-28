@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { app } from 'electron';
-import * as AdmZip from 'adm-zip';
+import AdmZip from 'adm-zip';
 import { DownloadManager, DownloadTask } from '../download/DownloadManager';
 import * as os from 'os';
 
@@ -119,7 +119,7 @@ export class LibraryResolver {
 
                 const exclusions = task.extractRules?.exclude || [];
 
-                zipEntries.forEach((entry) => {
+                zipEntries.forEach((entry: any) => {
                     // Ignore directories and META-INF
                     if (entry.isDirectory) return;
 

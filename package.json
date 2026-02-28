@@ -8,12 +8,14 @@
     "scripts": {
         "dev": "vite",
         "build": "cross-env CSC_LINK=null vite build && electron-builder",
-        "preview": "vite preview"
+        "preview": "vite preview",
+        "typecheck": "tsc --noEmit"
     },
     "dependencies": {
         "@types/adm-zip": "^0.5.7",
         "adm-zip": "^0.5.16",
         "lucide-react": "^0.500.0",
+        "prismarine-nbt": "^2.8.0",
         "react": "^19.0.0",
         "react-dom": "^19.0.0"
     },

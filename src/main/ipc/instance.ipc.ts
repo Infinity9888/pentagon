@@ -1,6 +1,7 @@
-import { IpcMain, shell } from 'electron';
+import { IpcMain, shell, dialog, BrowserWindow } from 'electron';
 import { LaunchService } from '../services/launch/LaunchService';
 import { InstanceManager, InstanceConfig } from '../services/instances/InstanceManager';
+import { ModpackInstaller } from '../services/instances/ModpackInstaller';
 import { authService } from './auth.ipc';
 import * as path from 'path';
 
@@ -22,6 +23,18 @@ export function registerInstanceIPC(ipcMain: IpcMain): void {
             return { success: true, id };
         } catch (e: any) {
             console.error('Failed to create instance', e);
+            return { success: false, error: e.message };
+        }
+    });
+
+    ipcMain.handle('instances:create-cf-modpack', async (event, addonId: string, fileId: string) => {
+        try {
+            const id = await ModpackInstaller.installCurseForgeModpack(addonId, fileId, (msg, percent) => {
+                event.sender.send('mods:install-progress', { modId: addonId, message: msg, percent });
+            });
+            return { success: true, id };
+        } catch (e: any) {
+            console.error('Failed to install CF modpack', e);
             return { success: false, error: e.message };
         }
     });
@@ -114,6 +127,43 @@ export function registerInstanceIPC(ipcMain: IpcMain): void {
             return { success: true };
         } catch (e: any) {
             console.error('Failed to open folder', e);
+            return { success: false, error: e.message };
+        }
+    });
+
+    ipcMain.handle('instances:install-local-files', async (_, files: string[]) => {
+        try {
+            await InstanceManager.installLocalFiles(files);
+            return { success: true };
+        } catch (e: any) {
+            console.error('Failed to install local files', e);
+            return { success: false, error: e.message };
+        }
+    });
+
+    ipcMain.handle('instances:add-local-jar', async (_, id: string) => {
+        try {
+            const window = BrowserWindow.getFocusedWindow();
+            if (!window) return { success: false, error: "No focused window" };
+
+            const result = await dialog.showOpenDialog(window, {
+                title: 'Select Mod Files',
+                buttonLabel: 'Add to Instance',
+                filters: [
+                    { name: 'Minecraft Mods', extensions: ['jar'] },
+                    { name: 'All Files', extensions: ['*'] }
+                ],
+                properties: ['openFile', 'multiSelections']
+            });
+
+            if (!result.canceled && result.filePaths.length > 0) {
+                await InstanceManager.addLocalMods(id, result.filePaths);
+                return { success: true, filesAdded: result.filePaths.length };
+            }
+
+            return { success: false, error: "User canceled selection" };
+        } catch (e: any) {
+            console.error('Failed to add local jars', e);
             return { success: false, error: e.message };
         }
     });

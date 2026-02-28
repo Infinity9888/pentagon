@@ -12,6 +12,13 @@ export default defineConfig({
         electron({
             main: {
                 entry: { main: 'src/main/index.ts' },
+                vite: {
+                    build: {
+                        rollupOptions: {
+                            external: ['prismarine-nbt']
+                        }
+                    }
+                }
             },
             preload: {
                 input: { preload: path.join(__dirname, 'src/preload/index.ts') },

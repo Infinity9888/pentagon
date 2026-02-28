@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer } from 'electron';
+import { contextBridge, ipcRenderer, webUtils } from 'electron';
 
 export type PentagonAPI = typeof pentagonAPI;
 
@@ -23,6 +23,7 @@ const pentagonAPI = {
     instances: {
         list: () => ipcRenderer.invoke('instances:list'),
         create: (config: any) => ipcRenderer.invoke('instances:create', config),
+        createCFModpack: (addonId: string, fileId: string) => ipcRenderer.invoke('instances:create-cf-modpack', addonId, fileId),
         launch: (id: string, options?: any) => ipcRenderer.invoke('instances:launch', id, options),
         kill: (id: string) => ipcRenderer.invoke('instances:kill', id),
         delete: (id: string) => ipcRenderer.invoke('instances:delete', id),
@@ -33,6 +34,8 @@ const pentagonAPI = {
         listMods: (id: string) => ipcRenderer.invoke('instances:list-mods', id),
         toggleMod: (id: string, fileName: string) => ipcRenderer.invoke('instances:toggle-mod', id, fileName),
         deleteMod: (id: string, fileName: string) => ipcRenderer.invoke('instances:delete-mod', id, fileName),
+        installLocalFiles: (files: string[]) => ipcRenderer.invoke('instances:install-local-files', files),
+        addLocalJar: (id: string) => ipcRenderer.invoke('instances:add-local-jar', id),
         onLog: (cb: (data: { instanceId: string; line: string; level: string }) => void) => {
             ipcRenderer.on('instances:log', (_, data) => cb(data));
             return () => ipcRenderer.removeAllListeners('instances:log');
@@ -45,11 +48,16 @@ const pentagonAPI = {
 
     mods: {
         search: (query: string, type?: 'mod' | 'modpack', provider?: 'modrinth' | 'curseforge') => ipcRenderer.invoke('mods:search', query, type, provider),
-        install: (instanceId: string, mod: any) => ipcRenderer.invoke('mods:install', instanceId, mod),
+        install: (instanceId: string, mod: any, fileId?: string) => ipcRenderer.invoke('mods:install', instanceId, mod, fileId),
+        getFiles: (instanceId: string, modId: string, provider: 'modrinth' | 'curseforge') => ipcRenderer.invoke('mods:getFiles', instanceId, modId, provider),
         remove: (instanceId: string, filename: string) => ipcRenderer.invoke('mods:remove', instanceId, filename),
         getInstalled: (instanceId: string) => ipcRenderer.invoke('mods:get-installed', instanceId),
         checkUpdates: (instanceId: string) => ipcRenderer.invoke('mods:check-updates', instanceId),
-        toggleEnabled: (instanceId: string, filename: string) => ipcRenderer.invoke('mods:toggle', instanceId, filename)
+        toggleEnabled: (instanceId: string, filename: string) => ipcRenderer.invoke('mods:toggle', instanceId, filename),
+        onInstallProgress: (cb: (data: { modId: string; message: string; percent?: number }) => void) => {
+            ipcRenderer.on('mods:install-progress', (_, data) => cb(data));
+            return () => ipcRenderer.removeAllListeners('mods:install-progress');
+        }
     },
 
     versions: {
@@ -93,6 +101,23 @@ const pentagonAPI = {
             ipcRenderer.on('window:maximized-changed', (_, maximized) => cb(maximized));
             return () => ipcRenderer.removeAllListeners('window:maximized-changed');
         }
+    },
+
+    app: {
+        onOpenUrl: (cb: (url: string) => void) => {
+            ipcRenderer.on('app:open-url', (_, url) => cb(url));
+            return () => ipcRenderer.removeAllListeners('app:open-url');
+        }
+    },
+
+    utils: {
+        getPathForFile: (file: File) => webUtils.getPathForFile(file)
+    },
+
+    servers: {
+        get: (instanceId: string) => ipcRenderer.invoke('servers:get', instanceId),
+        add: (instanceId: string, serverInfo: { name: string, ip: string }) => ipcRenderer.invoke('servers:add', instanceId, serverInfo),
+        remove: (instanceId: string, serverIp: string) => ipcRenderer.invoke('servers:remove', instanceId, serverIp)
     }
 };
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from '../../i18n';
 import './ConfigView.css';
 
 interface VersionViewProps {
@@ -6,6 +7,7 @@ interface VersionViewProps {
 }
 
 export default function VersionView({ instanceId }: VersionViewProps) {
+    const { t } = useTranslation();
     const [config, setConfig] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
@@ -73,23 +75,23 @@ export default function VersionView({ instanceId }: VersionViewProps) {
     };
 
     if (loading) {
-        return <div className="config-view animate-fade-in"><div className="loading-state" style={{ padding: '2rem', color: 'var(--color-text-muted)' }}>Loading version info...</div></div>;
+        return <div className="config-view animate-fade-in"><div className="loading-state" style={{ padding: '2rem', color: 'var(--color-text-muted)' }}>{t('instances.config.loading')}</div></div>;
     }
 
     if (!config) {
-        return <div className="config-view animate-fade-in"><div className="error-state" style={{ padding: '2rem', color: 'var(--color-error)' }}>Failed to load instance config.</div></div>;
+        return <div className="config-view animate-fade-in"><div className="error-state" style={{ padding: '2rem', color: 'var(--color-error)' }}>{t('instances.config.errorLoad')}</div></div>;
     }
 
     return (
         <div className="config-view animate-fade-in">
             <div className="view-header flex-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
-                    <h3>Version Details</h3>
-                    <p>Manage the core components installed for this instance.</p>
+                    <h3>{t('instances.config.version.title')}</h3>
+                    <p>{t('instances.config.version.desc')}</p>
                 </div>
                 <div className="view-actions">
                     <button className="btn btn-secondary" onClick={() => window.pentagon?.instances?.openFolder?.(instanceId)}>
-                        Open Folder
+                        {t('instances.config.openFolder')}
                     </button>
                 </div>
             </div>
@@ -98,16 +100,16 @@ export default function VersionView({ instanceId }: VersionViewProps) {
                 <table className="data-table">
                     <thead>
                         <tr>
-                            <th>Component</th>
-                            <th>Version</th>
-                            <th>Status</th>
+                            <th>{t('instances.config.version.component')}</th>
+                            <th>{t('instances.config.version.version')}</th>
+                            <th>{t('instances.config.version.status')}</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td>LWJGL 3</td>
-                            <td>(Auto-resolved)</td>
-                            <td className="status-ok">✔ Active</td>
+                            <td>{t('instances.config.version.autoResolved')}</td>
+                            <td className="status-ok">{t('instances.config.statusActive')}</td>
                         </tr>
                         <tr>
                             <td>Minecraft</td>
@@ -124,7 +126,7 @@ export default function VersionView({ instanceId }: VersionViewProps) {
                                     ))}
                                 </select>
                             </td>
-                            <td className="status-ok">✔ Configured</td>
+                            <td className="status-ok">{t('instances.config.statusConfigured')}</td>
                         </tr>
                         {config.version.fabric && (
                             <tr>

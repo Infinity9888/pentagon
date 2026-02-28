@@ -19,3 +19,65 @@
     padding: var(--content-padding);
     animation: fadeIn var(--duration-slow) var(--ease-out);
 }
+
+/* Global Drag & Drop Overlay */
+.global-drag-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.drag-content {
+    background: var(--color-surface);
+    border: 2px dashed var(--color-primary);
+    border-radius: var(--radius-xl);
+    padding: var(--space-8) var(--space-12);
+    text-align: center;
+    box-shadow: 0 0 40px rgba(99, 102, 241, 0.3);
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    transform: scale(1.05);
+    animation: pulse border-pulse 2s infinite;
+}
+
+.drag-icon {
+    font-size: 64px;
+    margin-bottom: var(--space-2);
+}
+
+.drag-content h2 {
+    color: var(--color-primary);
+    font-size: var(--font-size-2xl);
+    margin: 0;
+}
+
+.drag-content p {
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+@keyframes border-pulse {
+    0% {
+        border-color: rgba(99, 102, 241, 0.5);
+    }
+
+    50% {
+        border-color: rgba(99, 102, 241, 1);
+    }
+
+    100% {
+        border-color: rgba(99, 102, 241, 0.5);
+    }
+}

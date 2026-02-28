@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from '../../i18n';
 import './CreateInstanceModal.css';
 
 interface CreateInstanceModalProps {
@@ -7,6 +8,7 @@ interface CreateInstanceModalProps {
 }
 
 export default function CreateInstanceModal({ onClose, onCreated }: CreateInstanceModalProps) {
+    const { t } = useTranslation();
     const [name, setName] = useState('');
     const [activeTab, setActiveTab] = useState('vanilla');
 
@@ -31,6 +33,16 @@ export default function CreateInstanceModal({ onClose, onCreated }: CreateInstan
     const [selectedPack, setSelectedPack] = useState<any>(null);
 
     useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                onClose();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [onClose]);
+
+    useEffect(() => {
         // Fetch Minecraft versions
         window.pentagon?.versions?.getMinecraft?.()
             .then((versions: any) => {
@@ -40,7 +52,7 @@ export default function CreateInstanceModal({ onClose, onCreated }: CreateInstan
                 setLoading(false);
             })
             .catch((e: any) => {
-                setError('Failed to fetch Minecraft versions');
+                setError(t('createInstance.versionError'));
                 setLoading(false);
             });
     }, []);
@@ -83,12 +95,12 @@ export default function CreateInstanceModal({ onClose, onCreated }: CreateInstan
 
     const handleCreate = async () => {
         if (!name.trim()) {
-            setError('Please enter an instance name');
+            setError(t('createInstance.nameError'));
             return;
         }
 
         if (activeTab === 'modrinth' && !selectedPack) {
-            setError('Please select a modpack to install');
+            setError(t('createInstance.packError'));
             return;
         }
 
@@ -111,7 +123,7 @@ export default function CreateInstanceModal({ onClose, onCreated }: CreateInstan
                 onCreated();
                 onClose();
             } else {
-                setError(res?.error || 'Failed to create instance');
+                setError(res?.error || t('createInstance.createError'));
             }
         } catch (e: any) {
             setError(e.message);
@@ -124,8 +136,8 @@ export default function CreateInstanceModal({ onClose, onCreated }: CreateInstan
         <div className="modal-backdrop animate-fade-in">
             <div className="create-modal animate-slide-up">
                 <div className="create-header">
-                    <h2>Add Instance</h2>
-                    <button className="btn-icon" onClick={onClose} title="Close">
+                    <h2>{t('createInstance.title')}</h2>
+                    <button className="btn-icon" onClick={onClose} title={t('home.close')}>
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <line x1="18" y1="6" x2="6" y2="18"></line>
                             <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -135,7 +147,7 @@ export default function CreateInstanceModal({ onClose, onCreated }: CreateInstan
 
                 <div className="create-tabs">
                     <button className={`tab-btn ${activeTab === 'vanilla' ? 'active' : ''}`} onClick={() => setActiveTab('vanilla')}>
-                        Vanilla / Custom
+                        {t('createInstance.vanilla')}
                     </button>
                     <button className={`tab-btn ${activeTab === 'modrinth' ? 'active' : ''}`} onClick={() => setActiveTab('modrinth')}>
                         Modrinth
@@ -149,11 +161,11 @@ export default function CreateInstanceModal({ onClose, onCreated }: CreateInstan
                     {error && <div className="error-banner">{error}</div>}
 
                     <div className="form-group">
-                        <label>Name</label>
+                        <label>{t('createInstance.namePlaceholder')}</label>
                         <input
                             type="text"
                             className="form-input"
-                            placeholder="My Awesome Assembly"
+                            placeholder={t('createInstance.namePlaceholder')}
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             autoFocus
@@ -163,7 +175,7 @@ export default function CreateInstanceModal({ onClose, onCreated }: CreateInstan
                     {activeTab === 'vanilla' && (
                         <div className="version-selectors">
                             <div className="form-group">
-                                <label>Minecraft Version</label>
+                                <label>{t('createInstance.version')}</label>
                                 {loading ? (
                                     <select className="form-select" disabled><option>Loading...</option></select>
                                 ) : (
@@ -176,7 +188,7 @@ export default function CreateInstanceModal({ onClose, onCreated }: CreateInstan
                             </div>
 
                             <div className="form-group" style={{ marginBottom: 0 }}>
-                                <label>Mod Loader</label>
+                                <label>{t('createInstance.loader')}</label>
                                 <div style={{ display: 'flex', gap: 'var(--space-2)', marginBottom: 'var(--space-3)' }}>
                                     <button
                                         className={`btn ${selectedLoaderType === 'vanilla' ? 'btn-primary' : 'btn-secondary'}`}
@@ -233,7 +245,7 @@ export default function CreateInstanceModal({ onClose, onCreated }: CreateInstan
                                 <input
                                     type="text"
                                     className="form-input"
-                                    placeholder="Search Modrinth for modpacks..."
+                                    placeholder={t('createInstance.searchPack')}
                                     value={searchQuery}
                                     onChange={e => setSearchQuery(e.target.value)}
                                     style={{ flex: 1 }}
@@ -242,7 +254,7 @@ export default function CreateInstanceModal({ onClose, onCreated }: CreateInstan
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                         <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                                     </svg>
-                                    Search
+                                    {isSearching ? '...' : t('createInstance.search')}
                                 </button>
                             </form>
 
@@ -272,7 +284,7 @@ export default function CreateInstanceModal({ onClose, onCreated }: CreateInstan
                                     </div>
                                 ))}
                                 {searchResults.length === 0 && !isSearching && searchQuery && (
-                                    <div className="text-center" style={{ padding: 'var(--space-4)', color: 'var(--color-text-muted)' }}>No modpacks found.</div>
+                                    <div className="text-center" style={{ padding: 'var(--space-4)', color: 'var(--color-text-muted)' }}>{t('mods.notFound')}</div>
                                 )}
                             </div>
                         </div>
@@ -287,9 +299,9 @@ export default function CreateInstanceModal({ onClose, onCreated }: CreateInstan
                 </div>
 
                 <div className="create-footer">
-                    <button className="btn btn-secondary" onClick={onClose} disabled={creating}>Cancel</button>
+                    <button className="btn btn-secondary" onClick={onClose} disabled={creating}>{t('home.cancel')}</button>
                     <button className="btn btn-primary" onClick={handleCreate} disabled={creating || loading}>
-                        {creating ? 'Creating...' : 'Create'}
+                        {creating ? t('instances.launching') : t('createInstance.createBtn')}
                     </button>
                 </div>
             </div>

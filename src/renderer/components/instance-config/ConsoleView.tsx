@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from '../../i18n';
 import './ConfigView.css';
 
 interface ConsoleViewProps {
@@ -6,6 +7,7 @@ interface ConsoleViewProps {
 }
 
 export default function ConsoleView({ instanceId }: ConsoleViewProps) {
+    const { t } = useTranslation();
     const [logs, setLogs] = useState<string[]>([]);
 
     useEffect(() => {
@@ -29,22 +31,22 @@ export default function ConsoleView({ instanceId }: ConsoleViewProps) {
         <div className="config-view animate-fade-in" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             <div className="view-header flex-row">
                 <div>
-                    <h3>Minecraft Log</h3>
-                    <p>Real-time game output for troubleshooting.</p>
+                    <h3>{t('instances.config.console.title')}</h3>
+                    <p>{t('instances.config.console.desc')}</p>
                 </div>
                 <div className="view-actions" style={{ display: 'flex', gap: 'var(--space-2)' }}>
                     <button className="btn btn-secondary" onClick={() => window.pentagon?.instances?.openFolder?.(instanceId, 'logs')}>
-                        Open Folder
+                        {t('instances.config.openFolder')}
                     </button>
-                    <button className="btn btn-secondary" onClick={copyLogs}>Copy</button>
-                    <button className="btn btn-secondary" onClick={clearLogs}>Clear</button>
+                    <button className="btn btn-secondary" onClick={copyLogs}>{t('instances.config.console.copy')}</button>
+                    <button className="btn btn-secondary" onClick={clearLogs}>{t('instances.config.console.clear')}</button>
                 </div>
             </div>
 
             <div className="view-content console-output" style={{ padding: 'var(--space-3)', fontFamily: 'var(--font-family-mono)', fontSize: 'var(--font-size-sm)', backgroundColor: '#000', color: '#ccc', flex: 1, overflowY: 'auto', whiteSpace: 'pre-wrap' }}>
                 {logs.length === 0 ? (
                     <div style={{ color: 'var(--color-text-muted)', textAlign: 'center', marginTop: 'var(--space-10)' }}>
-                        Waiting for log output... Launch the game to view logs here.
+                        {t('instances.config.console.waiting')}
                     </div>
                 ) : (
                     logs.map((log, i) => (

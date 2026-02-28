@@ -49,52 +49,72 @@ export class ModPlatformService {
 
         const url = `${this.MODRINTH_API}/search?${urlOptions.toString()}`;
 
-        return new Promise((resolve, reject) => {
-            const request = net.request(url);
-            request.setHeader('User-Agent', this.USER_AGENT);
-
-            request.on('response', (response) => {
-                let data = '';
-                response.on('data', (chunk) => data += chunk.toString());
-                response.on('end', () => {
-                    try {
-                        if (response.statusCode === 200) {
-                            resolve(JSON.parse(data));
-                        } else {
-                            reject(new Error(`Modrinth returned ${response.statusCode}: ${data}`));
-                        }
-                    } catch (e) {
-                        reject(e);
-                    }
-                });
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    'User-Agent': this.USER_AGENT
+                }
             });
-            request.on('error', reject);
-            request.end();
-        });
+            const text = await response.text();
+            if (!response.ok) {
+                throw new Error(`Modrinth returned ${response.status}: ${text}`);
+            }
+            return JSON.parse(text);
+        } catch (e: any) {
+            throw new Error(`Failed to search Modrinth: ${e.message}`);
+        }
     }
 
     /**
      * Get specific project details
      */
     public static async getModrinthProject(slugOrId: string): Promise<any> {
-        return new Promise((resolve, reject) => {
-            const request = net.request(`${this.MODRINTH_API}/project/${slugOrId}`);
-            request.setHeader('User-Agent', this.USER_AGENT);
-
-            request.on('response', (response) => {
-                let data = '';
-                response.on('data', (chunk) => data += chunk.toString());
-                response.on('end', () => {
-                    try {
-                        resolve(JSON.parse(data));
-                    } catch (e) {
-                        reject(e);
-                    }
-                });
+        const url = `${this.MODRINTH_API}/project/${slugOrId}`;
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    'User-Agent': this.USER_AGENT
+                }
             });
-            request.on('error', reject);
-            request.end();
-        });
+            const text = await response.text();
+            if (!response.ok) {
+                throw new Error(`Modrinth returned ${response.status}: ${text}`);
+            }
+            return JSON.parse(text);
+        } catch (e: any) {
+            throw new Error(`Failed to fetch Modrinth project ${slugOrId}: ${e.message}`);
+        }
+    }
+
+    /**
+     * Get versions for a project, filtered by game version and loader
+     */
+    public static async getModrinthVersions(slugOrId: string, loaders?: string[], gameVersions?: string[]): Promise<any[]> {
+        let url = `${this.MODRINTH_API}/project/${slugOrId}/version`;
+        const params = new URLSearchParams();
+
+        if (loaders && loaders.length > 0) {
+            params.append('loaders', JSON.stringify(loaders));
+        }
+        if (gameVersions && gameVersions.length > 0) {
+            params.append('game_versions', JSON.stringify(gameVersions));
+        }
+
+        const queryString = params.toString();
+        if (queryString) {
+            url += `?${queryString}`;
+        }
+
+        try {
+            const res = await fetch(url, { headers: { 'User-Agent': this.USER_AGENT } });
+            if (!res.ok) {
+                const text = await res.text();
+                throw new Error(`Modrinth returned ${res.status}: ${text}`);
+            }
+            return await res.json();
+        } catch (e: any) {
+            throw new Error(`Failed to fetch modrinth versions for ${slugOrId} at ${url}: ${e.message}`);
+        }
     }
 
     /**
@@ -114,58 +134,113 @@ export class ModPlatformService {
 
         const url = `${this.CURSEFORGE_API}/mods/search?${urlOptions.toString()}`;
 
-        return new Promise((resolve, reject) => {
-            const request = net.request(url);
-            request.setHeader('User-Agent', this.USER_AGENT);
-            request.setHeader('x-api-key', this.CURSEFORGE_API_KEY);
-            request.setHeader('Accept', 'application/json');
-
-            request.on('response', (response) => {
-                let data = '';
-                response.on('data', (chunk) => data += chunk.toString());
-                response.on('end', () => {
-                    try {
-                        if (response.statusCode === 200) {
-                            const parsed = JSON.parse(data);
-                            // Normalize to Modrinth format so frontend doesn't need to care
-                            const hits = parsed.data.map((cfMod: any) => ({
-                                project_id: cfMod.id.toString(),
-                                project_type: type,
-                                slug: cfMod.slug,
-                                author: cfMod.authors && cfMod.authors.length > 0 ? cfMod.authors[0].name : 'Unknown',
-                                title: cfMod.name,
-                                description: cfMod.summary,
-                                categories: [],
-                                display_categories: [],
-                                versions: [],
-                                downloads: cfMod.downloadCount,
-                                follows: 0,
-                                icon_url: cfMod.logo ? cfMod.logo.url : '',
-                                date_created: cfMod.dateCreated,
-                                date_modified: cfMod.dateModified,
-                                latest_version: '',
-                                license: '',
-                                client_side: 'optional',
-                                server_side: 'optional',
-                                gallery: []
-                            }));
-
-                            resolve({
-                                hits: hits,
-                                offset: parsed.pagination.index,
-                                limit: parsed.pagination.pageSize,
-                                total_hits: parsed.pagination.totalCount
-                            });
-                        } else {
-                            reject(new Error(`CurseForge returned ${response.statusCode}: ${data}`));
-                        }
-                    } catch (e) {
-                        reject(e);
-                    }
-                });
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    'User-Agent': this.USER_AGENT,
+                    'x-api-key': this.CURSEFORGE_API_KEY,
+                    'Accept': 'application/json'
+                }
             });
-            request.on('error', reject);
-            request.end();
-        });
+
+            const text = await response.text();
+            if (!response.ok) {
+                throw new Error(`CurseForge returned ${response.status}: ${text}`);
+            }
+
+            const parsed = JSON.parse(text);
+            const hits = parsed.data.map((cfMod: any) => ({
+                project_id: cfMod.id.toString(),
+                project_type: type,
+                slug: cfMod.slug,
+                author: cfMod.authors && cfMod.authors.length > 0 ? cfMod.authors[0].name : 'Unknown',
+                title: cfMod.name,
+                description: cfMod.summary,
+                categories: [],
+                display_categories: [],
+                versions: [],
+                downloads: cfMod.downloadCount,
+                follows: 0,
+                icon_url: cfMod.logo ? cfMod.logo.url : '',
+                date_created: cfMod.dateCreated,
+                date_modified: cfMod.dateModified,
+                latest_version: '',
+                license: '',
+                client_side: 'optional',
+                server_side: 'optional',
+                gallery: []
+            }));
+
+            return {
+                hits: hits,
+                offset: parsed.pagination.index,
+                limit: parsed.pagination.pageSize,
+                total_hits: parsed.pagination.totalCount
+            };
+        } catch (e: any) {
+            throw new Error(`Failed to search CurseForge: ${e.message}`);
+        }
+    }
+
+    /**
+     * Get files for a CurseForge project, filtered by game version and loader type
+     * @param modId CurseForge Project ID
+     * @param gameVersion Minecraft version string (e.g., '1.20.1')
+     * @param modLoaderType CurseForge Loader ID (1=Forge, 4=Fabric, 5=Quilt, 6=NeoForge)
+     */
+    public static async getCurseForgeModFiles(modId: string, gameVersion?: string, modLoaderType?: number): Promise<any[]> {
+        const urlOptions = new URLSearchParams();
+        urlOptions.append('pageSize', '50'); // Usually 50 is enough for recent files
+        if (gameVersion) urlOptions.append('gameVersion', gameVersion);
+        if (modLoaderType !== undefined) urlOptions.append('modLoaderType', modLoaderType.toString());
+
+        const url = `${this.CURSEFORGE_API}/mods/${modId}/files?${urlOptions.toString()}`;
+
+        try {
+            const res = await fetch(url, {
+                headers: {
+                    'User-Agent': this.USER_AGENT,
+                    'x-api-key': this.CURSEFORGE_API_KEY,
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (!res.ok) {
+                const text = await res.text();
+                throw new Error(`CurseForge returned ${res.status}: ${text}`);
+            }
+
+            const data = await res.json();
+            return data.data || [];
+        } catch (e: any) {
+            throw new Error(`Failed to fetch CurseForge files for ${modId}: ${e.message}`);
+        }
+    }
+
+    /**
+     * Get a specific file from CurseForge
+     */
+    public static async getCurseForgeFile(modId: string, fileId: string): Promise<any> {
+        const url = `${this.CURSEFORGE_API}/mods/${modId}/files/${fileId}`;
+
+        try {
+            const res = await fetch(url, {
+                headers: {
+                    'User-Agent': this.USER_AGENT,
+                    'x-api-key': this.CURSEFORGE_API_KEY,
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (!res.ok) {
+                const text = await res.text();
+                throw new Error(`CurseForge returned ${res.status}: ${text}`);
+            }
+
+            const data = await res.json();
+            return data.data;
+        } catch (e: any) {
+            throw new Error(`Failed to fetch CurseForge file ${fileId} for mod ${modId}: ${e.message}`);
+        }
     }
 }
