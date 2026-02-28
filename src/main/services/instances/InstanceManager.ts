@@ -1,6 +1,6 @@
-import { app } from 'electron';
 import fs from 'fs';
 import path from 'path';
+import { PathResolver } from '../utils/PathResolver';
 
 export interface InstanceConfig {
     name: string;
@@ -22,11 +22,11 @@ export interface InstanceConfig {
 
 export class InstanceManager {
     public static getDataDir(): string {
-        return path.join(app.getPath('userData'), 'data');
+        return PathResolver.getDataDir();
     }
 
     public static getInstancesDir(): string {
-        return path.join(this.getDataDir(), 'instances');
+        return PathResolver.getInstancesDir();
     }
 
     public static async createInstance(id: string, config: InstanceConfig): Promise<void> {

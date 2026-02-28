@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { app } from 'electron';
+import { PathResolver } from '../utils/PathResolver';
 
 const MOJANG_MANIFEST_URL = 'https://piston-meta.mojang.com/mc/game/version_manifest_v2.json';
 
@@ -24,9 +24,7 @@ export interface VersionManifest {
 
 export class VersionManager {
     static get versionsDir(): string {
-        const p = path.join(app.getPath('userData'), 'data', 'versions');
-        if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true });
-        return p;
+        return PathResolver.getVersionsDir();
     }
 
     /**

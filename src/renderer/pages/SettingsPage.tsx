@@ -5,9 +5,11 @@ import './SettingsPage.css';
 export default function SettingsPage() {
     const { t, setLanguage } = useTranslation();
     const [settings, setSettings] = useState<any>(null);
+    const [resolvedDataDir, setResolvedDataDir] = useState<string>('');
 
     useEffect(() => {
         window.pentagon.settings.get().then(setSettings).catch(console.error);
+        window.pentagon.settings.getDataDir().then(setResolvedDataDir).catch(console.error);
     }, []);
 
     const handleChange = (key: string, value: any) => {
@@ -19,6 +21,12 @@ export default function SettingsPage() {
             document.documentElement.setAttribute('data-theme', value);
         } else if (key === 'language') {
             setLanguage(value);
+        } else if (key === 'dataPath') {
+            // After changing data path, we might need a restart warning or immediate refresh
+            // For now, just getting the new resolved path to show the user
+            window.pentagon.settings.getDataDir().then((path: string) => {
+                setResolvedDataDir(path);
+            });
         }
     };
 
@@ -80,6 +88,34 @@ export default function SettingsPage() {
                                 onChange={e => handleChange('jvmArgs', e.target.value)}
                                 placeholder="-XX:+UseG1GC"
                             />
+                        </div>
+                        <div className="setting-row">
+                            <div className="setting-info">
+                                <label>{t('settings.dataPath')}</label>
+                                <span className="setting-hint" title={resolvedDataDir}>
+                                    {resolvedDataDir.length > 40 ? '...' + resolvedDataDir.slice(-40) : resolvedDataDir}
+                                </span>
+                            </div>
+                            <div className="setting-actions">
+                                {settings.dataPath && (
+                                    <button
+                                        className="btn btn-secondary btn-sm"
+                                        style={{ marginRight: '8px' }}
+                                        onClick={() => handleChange('dataPath', '')}
+                                    >
+                                        {t('settings.reset')}
+                                    </button>
+                                )}
+                                <button
+                                    className="btn btn-secondary btn-sm"
+                                    onClick={async () => {
+                                        const path = await window.pentagon.settings.selectDirectory();
+                                        if (path) handleChange('dataPath', path);
+                                    }}
+                                >
+                                    {t('settings.select')}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </section>

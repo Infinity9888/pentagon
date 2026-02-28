@@ -26,7 +26,7 @@ export interface GitHubRelease {
 
 export class NewsService {
     // Current package version to compare against GitHub releases
-    private static CURRENT_VERSION = '0.2.0';
+    private static readonly CURRENT_VERSION = '0.2.1';
 
     /**
      * Generic helper to fetch JSON from a URL via electron.net.

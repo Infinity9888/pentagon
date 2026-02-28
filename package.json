@@ -1,6 +1,6 @@
 {
     "name": "pentagon-launcher",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "description": "Pentagon — A Modern Minecraft Launcher",
     "main": "dist-electron/main.js",
     "author": "Pentagon Team",
@@ -43,6 +43,7 @@
             "package.json"
         ],
         "win": {
+            "executableName": "Pentagon Launcher",
             "forceCodeSigning": false,
             "target": [
                 {
@@ -58,6 +59,14 @@
                     ]
                 }
             ]
+        },
+        "nsis": {
+            "oneClick": false,
+            "allowToChangeInstallationDirectory": true,
+            "createDesktopShortcut": true,
+            "createStartMenuShortcut": true,
+            "shortcutName": "Pentagon Launcher",
+            "uninstallDisplayName": "Pentagon Launcher"
         }
     }
 }

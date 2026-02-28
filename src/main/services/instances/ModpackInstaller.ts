@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { PathResolver } from '../utils/PathResolver';
 import AdmZip from 'adm-zip';
 import { app } from 'electron';
 import { InstanceManager } from './InstanceManager';
@@ -29,7 +30,7 @@ export class ModpackInstaller {
         }
 
         const safeId = `cf_${addonId}_${fileId}`;
-        const tempZipPath = path.join(app.getPath('userData'), 'data', 'temp', `${safeId}.zip`);
+        const tempZipPath = path.join(PathResolver.getTempDir(), `${safeId}.zip`);
 
         // Ensure temp directory exists
         const tempDir = path.dirname(tempZipPath);

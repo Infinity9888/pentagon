@@ -73,7 +73,8 @@ const pentagonAPI = {
         set: (settings: any) => ipcRenderer.invoke('settings:set', settings),
         getJavaVersions: () => ipcRenderer.invoke('settings:get-java'),
         selectJavaPath: () => ipcRenderer.invoke('settings:select-java-path'),
-        selectDirectory: () => ipcRenderer.invoke('settings:select-directory')
+        selectDirectory: () => ipcRenderer.invoke('settings:select-directory'),
+        getDataDir: () => ipcRenderer.invoke('settings:get-data-dir')
     },
 
     news: {

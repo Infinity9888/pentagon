@@ -7,6 +7,7 @@ export interface DownloadTask {
     destination: string;
     sha1?: string;
     size?: number;
+    extractTo?: string; // Opt-in for zip extraction after download
 }
 
 export class DownloadManager {

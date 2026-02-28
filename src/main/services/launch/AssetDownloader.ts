@@ -1,80 +1,68 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { app } from 'electron';
-import { DownloadManager, DownloadTask } from '../download/DownloadManager';
+import { PathResolver } from '../utils/PathResolver';
+import { DownloadManager } from '../download/DownloadManager';
 
 export interface AssetIndex {
-    objects: {
-        [key: string]: {
-            hash: string;
-            size: number;
-        }
-    }
+    objects: Record<string, { hash: string, size: number }>;
 }
 
 export class AssetDownloader {
-    static get assetsDir(): string {
-        const p = path.join(app.getPath('userData'), 'data', 'assets');
-        if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true });
-        return p;
-    }
-
     /**
      * Downloads the asset index and all corresponding asset objects.
      */
-    static async downloadAssets(
+    public static async downloadAssets(
         assetIndexInfo: { id: string, sha1: string, size: number, url: string },
         onProgress?: (totalSize: number, downloadedSoFar: number) => void
     ): Promise<string> {
-        // 1. Download the index file itself first
-        const indexesDir = path.join(this.assetsDir, 'indexes');
+        const assetsDir = PathResolver.getAssetsDir();
+        const objectsDir = PathResolver.getAssetsObjectsDir();
+        const indexesDir = PathResolver.getAssetsIndexesDir();
+
+        // Ensure directories exist
+        if (!fs.existsSync(assetsDir)) fs.mkdirSync(assetsDir, { recursive: true });
+        if (!fs.existsSync(objectsDir)) fs.mkdirSync(objectsDir, { recursive: true });
         if (!fs.existsSync(indexesDir)) fs.mkdirSync(indexesDir, { recursive: true });
 
+        // 1. Download the index file itself first
         const indexFilePath = path.join(indexesDir, `${assetIndexInfo.id}.json`);
 
-        await DownloadManager.downloadQueue([{
-            url: assetIndexInfo.url,
-            destination: indexFilePath,
-            sha1: assetIndexInfo.sha1,
-            size: assetIndexInfo.size
-        }], 1); // Serial download for the index
-
-        // 2. Parse the index
-        const indexContent = fs.readFileSync(indexFilePath, 'utf-8');
-        const assetIndex = JSON.parse(indexContent) as AssetIndex;
-
-        // 3. Build download queue for all objects
-        const objectsDir = path.join(this.assetsDir, 'objects');
-        if (!fs.existsSync(objectsDir)) fs.mkdirSync(objectsDir, { recursive: true });
-
-        const downloadTasks: DownloadTask[] = [];
-        let totalSize = 0;
-
-        for (const [key, obj] of Object.entries(assetIndex.objects)) {
-            const hash = obj.hash;
-            const folder = hash.substring(0, 2);
-
-            const destPath = path.join(objectsDir, folder, hash);
-            const downloadUrl = `https://resources.download.minecraft.net/${folder}/${hash}`;
-
-            downloadTasks.push({
-                url: downloadUrl,
-                destination: destPath,
-                sha1: hash,
-                size: obj.size
-            });
-
-            totalSize += obj.size;
+        if (!fs.existsSync(indexFilePath)) {
+            await DownloadManager.downloadQueue([{
+                url: assetIndexInfo.url,
+                destination: indexFilePath,
+                sha1: assetIndexInfo.sha1,
+                size: assetIndexInfo.size
+            }], 1);
         }
 
-        // 4. Fire concurrent download (using more concurrency since these are thousands of tiny files)
-        let downloadedSoFar = 0;
-        await DownloadManager.downloadQueue(downloadTasks, 20, (inc) => {
-            downloadedSoFar += inc;
-            if (onProgress) onProgress(totalSize, downloadedSoFar);
-        });
+        const indexContent = JSON.parse(fs.readFileSync(indexFilePath, 'utf-8')) as AssetIndex;
+        const tasks: any[] = [];
+        let totalSize = 0;
 
-        // 5. Return the absolute path to the assets root
-        return this.assetsDir;
+        for (const key in indexContent.objects) {
+            const obj = indexContent.objects[key];
+            const hash = obj.hash;
+            const prefix = hash.substring(0, 2);
+            const destination = path.join(objectsDir, prefix, hash);
+
+            if (!fs.existsSync(destination)) {
+                totalSize += obj.size;
+                tasks.push({
+                    url: `https://resources.download.minecraft.net/${prefix}/${hash}`,
+                    destination,
+                    sha1: hash,
+                    size: obj.size
+                });
+            }
+        }
+
+        if (tasks.length > 0) {
+            await DownloadManager.downloadQueue(tasks, 20, (downloaded) => {
+                onProgress?.(totalSize, downloaded);
+            });
+        }
+
+        return assetsDir;
     }
 }

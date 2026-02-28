@@ -1,14 +1,14 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as cp from 'child_process';
-import { app } from 'electron';
+import { settingsService } from '../settings/SettingsService';
+import { PathResolver } from '../utils/PathResolver';
 import { VersionManager } from './VersionManager';
 import { JavaDetector } from './JavaDetector';
 import { LibraryResolver } from './LibraryResolver';
 import { AssetDownloader } from './AssetDownloader';
 import { ArgumentBuilder, LaunchParams } from './ArgumentBuilder';
 import { DownloadManager } from '../download/DownloadManager';
-import { settingsService } from '../settings/SettingsService';
 
 export class LaunchService {
     private static activeProcesses: Map<string, cp.ChildProcess> = new Map();
@@ -22,7 +22,7 @@ export class LaunchService {
         try {
             onProgress('Initializing launch sequence...');
 
-            const instancesDir = path.join(app.getPath('userData'), 'data', 'instances');
+            const instancesDir = PathResolver.getInstancesDir();
             const instanceDir = path.join(instancesDir, instanceId);
             const minecraftDir = path.join(instanceDir, '.minecraft');
 
@@ -77,7 +77,7 @@ export class LaunchService {
                 version_type: versionJson.type,
                 natives_directory: nativesDir,
                 launcher_name: 'Pentagon Launcher',
-                launcher_version: '0.2.0',
+                launcher_version: '0.2.1',
                 classpath: classpathPaths,
                 resolution_width: '854',
                 resolution_height: '480'

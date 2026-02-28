@@ -1,6 +1,7 @@
 import { IpcMain, dialog } from 'electron';
 import { settingsService } from '../services/settings/SettingsService';
 import { JavaDetector } from '../services/launch/JavaDetector';
+import { PathResolver } from '../services/utils/PathResolver';
 
 export function registerSettingsIPC(ipcMain: IpcMain): void {
     ipcMain.handle('settings:get', async () => {
@@ -35,5 +36,9 @@ export function registerSettingsIPC(ipcMain: IpcMain): void {
             return result.filePaths[0];
         }
         return null;
+    });
+
+    ipcMain.handle('settings:get-data-dir', async () => {
+        return PathResolver.getDataDir();
     });
 }

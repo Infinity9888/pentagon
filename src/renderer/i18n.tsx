@@ -92,6 +92,8 @@ export const translations = {
         'settings.en': 'English',
         'settings.launch': 'Запуск',
         'settings.showConsole': 'Показывать консоль',
+        'settings.reset': 'Сбросить',
+        'settings.dataPath': 'Папка с данными',
 
         'instances.config.title': 'Настройка',
         'instances.config.version': 'Версия',
@@ -272,6 +274,8 @@ export const translations = {
         'settings.en': 'English',
         'settings.launch': 'Launch',
         'settings.showConsole': 'Show Console',
+        'settings.reset': 'Reset',
+        'settings.dataPath': 'Data Folder',
 
         'instances.config.title': 'Configuration',
         'instances.config.version': 'Version',

@@ -1,7 +1,7 @@
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
-import { app } from 'electron';
+import { PathResolver } from '../utils/PathResolver';
 import { MSAAuthFlow } from './MSAAuthFlow';
 
 // ─── Types ────────────────────────────────────────────────────────
@@ -67,10 +67,7 @@ export class AuthService {
 
     private ensureInitialized(): void {
         if (this.initialized) return;
-        const dataDir = path.join(app.getPath('userData'), 'data');
-        if (!fs.existsSync(dataDir)) {
-            fs.mkdirSync(dataDir, { recursive: true });
-        }
+        const dataDir = PathResolver.getDataDir();
         this.accountsFilePath = path.join(dataDir, 'accounts.json');
         this.loadAccounts();
         this.initialized = true;

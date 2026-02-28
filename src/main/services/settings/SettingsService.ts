@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { app } from 'electron';
+import { PathResolver } from '../utils/PathResolver';
 
 export interface AppSettings {
     javaPath: string;
@@ -12,6 +13,7 @@ export interface AppSettings {
     language: string;
     closeOnLaunch: boolean;
     showConsole: boolean;
+    dataPath: string;
 }
 
 const DEFAULT_SETTINGS: AppSettings = {
@@ -23,7 +25,8 @@ const DEFAULT_SETTINGS: AppSettings = {
     theme: 'dark',
     language: 'ru',
     closeOnLaunch: false,
-    showConsole: true
+    showConsole: true,
+    dataPath: ''
 };
 
 export class SettingsService {
@@ -37,10 +40,21 @@ export class SettingsService {
 
     private ensureInitialized(): void {
         if (this.initialized) return;
-        const dataDir = path.join(app.getPath('userData'), 'data');
-        if (!fs.existsSync(dataDir)) {
-            fs.mkdirSync(dataDir, { recursive: true });
+
+        // 1. Determine temporary settings path to load config
+        const tempSettingsPath = path.join(app.getPath('userData'), 'data', 'settings.json');
+
+        // 2. Try to load settings to find custom dataPath
+        if (fs.existsSync(tempSettingsPath)) {
+            try {
+                const data = JSON.parse(fs.readFileSync(tempSettingsPath, 'utf8'));
+                if (data.dataPath) {
+                    PathResolver.setCustomDataDir(data.dataPath);
+                }
+            } catch (e) { /* ignore */ }
         }
+
+        const dataDir = PathResolver.getDataDir();
         this.settingsFilePath = path.join(dataDir, 'settings.json');
         this.loadSettings();
         this.initialized = true;
